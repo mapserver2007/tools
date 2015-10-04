@@ -84,7 +84,7 @@ module Hentai
       uri = URI.parse(url)
       dir_path = @dir + "/" + uri.host + uri.path.gsub("\/", "_")
       unless Dir.exist?(dir_path)
-        if Dir.mkdir(@dir + "/" + uri.host + uri.path.gsub("\/", "_")) != 0
+        if Dir.mkdir(dir_path) != 0
           return nil
         end
       end
