@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'mechanize'
 require 'open-uri'
-require 'uri'
 require 'parallel_runner'
 
 module Hentai
@@ -19,13 +18,13 @@ module Hentai
         return
       end
 
-      url_list.each do |url|
-        save_dir = get_save_dir(url)
+      url_list.each do |url_info|
+        save_dir = get_save_dir(url_info["name"])
         if save_dir.nil?
           puts "保存ディレクトリが作成できませんでした"
           next
         end
-        get_url_pages(url).each_parallel do |url_page|
+        get_url_pages(url_info["url"]).each_parallel do |url_page|
           get_image_link_url(url_page) do |img_url|
             puts img_url
             save_image(save_dir, img_url)
@@ -80,9 +79,8 @@ module Hentai
       end
     end
 
-    def get_save_dir(url)
-      uri = URI.parse(url)
-      dir_path = @dir + "/" + uri.host + uri.path.gsub("\/", "_")
+    def get_save_dir(name)
+      dir_path = @dir + "/" + name
       unless Dir.exist?(dir_path)
         if Dir.mkdir(dir_path) != 0
           return nil
