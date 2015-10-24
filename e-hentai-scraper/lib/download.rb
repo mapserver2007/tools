@@ -10,6 +10,9 @@ module Hentai
   class Download
     def initialize(dir)
       @dir = dir
+      @agent = Mechanize.new
+      @agent.user_agent = USER_AGENT
+      @agent.read_timeout = 10
     end
 
     def download(url_list)
@@ -34,10 +37,7 @@ module Hentai
     end
 
     def get_url_pages(url)
-      agent = Mechanize.new
-      agent.user_agent = USER_AGENT
-      agent.read_timeout = 10
-      site = agent.get(url)
+      site = @agent.get(url)
       lines = (site/ "//table[@class='ptt']/tr/td/a")
       max_page = 0
       lines.each do |line|
@@ -54,10 +54,16 @@ module Hentai
     end
 
     def get_image_link_url(url)
-      agent = Mechanize.new
-      agent.user_agent = USER_AGENT
-      agent.read_timeout = 10
-      site = agent.get(url)
+      get_content_page(url) do |lines|
+        lines.each do |line|
+          site = @agent.get(line["href"])
+          (site/ "//img[@id='img']").each do |real_line|
+            yield real_line["src"] if /^https?/ =~ real_line["src"]
+          end
+        end
+      end
+
+
       lines = (site/ "//div[@class='gdtm']//a")
       lines.each do |line|
         site = agent.get(line["href"])
@@ -65,6 +71,17 @@ module Hentai
           yield real_line["src"] if /^https?/ =~ real_line["src"]
         end
       end
+    end
+
+    def get_content_page(url)
+      site = @agent.get(url)
+      lines = (site/ "//div[@class='gdtm']//a")
+      if lines.size == 0
+        site = @agent.get(url + "?nw=session")
+        lines = (site/ "//div[@class='gdtm']//a")
+      end
+
+      yield lines
     end
 
     def save_image(dir, url)
