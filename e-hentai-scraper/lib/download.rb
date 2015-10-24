@@ -62,15 +62,6 @@ module Hentai
           end
         end
       end
-
-
-      lines = (site/ "//div[@class='gdtm']//a")
-      lines.each do |line|
-        site = agent.get(line["href"])
-        (site/ "//img[@id='img']").each do |real_line|
-          yield real_line["src"] if /^https?/ =~ real_line["src"]
-        end
-      end
     end
 
     def get_content_page(url)
