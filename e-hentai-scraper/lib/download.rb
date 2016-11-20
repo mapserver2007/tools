@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'mechanize'
 require 'open-uri'
-require 'parallel_runner'
+require 'parallel'
 
 module Hentai
   REFERER = 'http://www.google.com/'
@@ -27,7 +27,7 @@ module Hentai
           puts "保存ディレクトリが作成できませんでした"
           next
         end
-        get_url_pages(url_info["url"]).each_parallel do |url_page|
+        Parallel.each(get_url_pages(url_info["url"]), in_threads: 3) do |url_page|
           get_image_link_url(url_page) do |img_url|
             puts img_url
             save_image(save_dir, img_url)
