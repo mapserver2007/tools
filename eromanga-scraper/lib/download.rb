@@ -27,16 +27,42 @@ module Hentai
           puts "保存ディレクトリが作成できませんでした"
           next
         end
-        Parallel.each(get_url_pages(url_info["url"]), in_threads: 3) do |url_page|
+        get_url_pages(url_info["url"], save_dir)
+      end
+    end
+
+    def get_url_pages(url, save_dir)
+      case url
+      when /e-hentai\.org/
+        url_list = get_url_pages_e_hentai(url)
+        Parallel.each(url_list, in_threads: 3) do |url_page|
           get_image_link_url(url_page) do |img_url|
             puts img_url
             save_image(save_dir, img_url)
           end
         end
+      when /eromanga-everyday\.com/
+        url_list = get_url_pages_eromanga_everyday(url)
+        Parallel.each(url_list, in_threads: 3) do |img_url|
+          puts img_url
+          save_image(save_dir, img_url)
+        end
       end
     end
 
-    def get_url_pages(url)
+    def get_url_pages_eromanga_everyday(url)
+      site = @agent.get(url)
+      url_list = []
+      lines = (site/ "//div[@id='main']/div/div[1]").search('img')
+      lines.each do |line|
+        url = line.attribute('src').value
+        url_list << url if /img\.eromanga-everyday\.com/ =~ url
+      end
+
+      url_list
+    end
+
+    def get_url_pages_e_hentai(url)
       site = @agent.get(url)
       lines = (site/ "//table[@class='ptt']/tr/td/a")
       max_page = 0
