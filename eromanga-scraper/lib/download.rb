@@ -12,7 +12,7 @@ module Hentai
       @dir = dir
       @agent = Mechanize.new
       @agent.user_agent = USER_AGENT
-      @agent.read_timeout = 10
+      @agent.read_timeout = 180
     end
 
     def download(url_list)
@@ -47,6 +47,12 @@ module Hentai
           puts img_url
           save_image(save_dir, img_url)
         end
+      when /nhentai\.net/
+        url_list = get_url_pages_nhentai(url)
+        Parallel.each(url_list, in_threads: 3) do |img_url|
+          puts img_url
+          save_image(save_dir, img_url)
+        end
       end
     end
 
@@ -74,6 +80,22 @@ module Hentai
       url_list = [url]
       max_page.times do |n|
         url_list << "#{url}?p=#{n}"
+      end
+
+      url_list
+    end
+
+    def get_url_pages_nhentai(url)
+      url_list = []
+      site = @agent.get(url)
+      lines = (site/ "//div[@class='thumb-container']/a/img")
+      lines.each do |line|
+        text = line.attribute('data-src').value
+        list = text.split('/')
+        id = list[4]
+        number = list[5].gsub(/t\..+/, '')
+
+        url_list << "https://i.nhentai.net/galleries/%s/%s.jpg" % [id, number]
       end
 
       url_list
