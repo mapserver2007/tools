@@ -92,10 +92,9 @@ module Hentai
       lines.each do |line|
         text = line.attribute('data-src').value
         list = text.split('/')
-        id = list[4]
-        number = list[5].gsub(/t\..+/, '')
-
-        url_list << "https://i.nhentai.net/galleries/%s/%s.jpg" % [id, number]
+        if /(\d+)t\.(.+)/ =~ list[5]
+          url_list << "https://i.nhentai.net/galleries/%s/%s.%s" % [list[4], $~[1], $~[2]]
+        end
       end
 
       url_list
