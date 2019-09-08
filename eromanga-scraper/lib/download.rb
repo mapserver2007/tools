@@ -41,7 +41,7 @@ module Hentai
             save_image(save_dir, img_url)
           end
         end
-      when /eromanga-everyday\.com/
+      when /eromanga-mainichi\.com/
         url_list = get_url_pages_eromanga_everyday(url)
         Parallel.each(url_list, in_threads: 3) do |img_url|
           puts img_url
@@ -62,7 +62,7 @@ module Hentai
       lines = (site/ "//div[@id='main']/div/div[1]").search('img')
       lines.each do |line|
         url = line.attribute('src').value
-        url_list << url if /img\.eromanga-everyday\.com/ =~ url
+        url_list << url if /img\.eromanga-mainichi\.com/ =~ url
       end
 
       url_list
