@@ -38,20 +38,20 @@ module Hentai
         Parallel.each(url_list, in_threads: 3) do |url_page|
           get_image_link_url(url_page) do |img_url|
             puts img_url
-            save_image(save_dir, img_url)
+            save_image(save_dir, img_url, {"Referer" => REFERER})
           end
         end
       when /eromanga-mainichi\.com/
         url_list = get_url_pages_eromanga_everyday(url)
         Parallel.each(url_list, in_threads: 3) do |img_url|
           puts img_url
-          save_image(save_dir, img_url)
+          save_image(save_dir, img_url, {"Referer" => REFERER})
         end
       when /nhentai\.net/
         url_list = get_url_pages_nhentai(url)
         Parallel.each(url_list, in_threads: 3) do |img_url|
           puts img_url
-          save_image(save_dir, img_url)
+          save_image(save_dir, img_url, {"Referer" => "https://i.nhentai.net/"})
         end
       end
     end
@@ -122,9 +122,9 @@ module Hentai
       yield lines
     end
 
-    def save_image(dir, url)
+    def save_image(dir, url, options)
       begin
-        open(url, "Referer" => REFERER) do |f|
+        open(url, options) do |f|
           open(dir + "/" + File.basename(url), 'wb') do |output|
             output.write(f.read)
           end
