@@ -24,7 +24,7 @@ module Hentai
           exit
         end
 
-        urls['urls'].each do |url_info|
+        (urls['urls'] || []).each do |url_info|
           save_dir = get_save_dir(url_info['name'], path)
           if save_dir.nil?
             puts '保存ディレクトリが作成できませんでした'
