@@ -1,3 +1,4 @@
-dir: 保存先ディレクトリパス
-url_list:
-  - {url: "ダウンロード先URL", name: "保存ディレクトリ名"}
+paths:
+  /path/to/ディレクトリ名:
+    urls:
+      - {url: "ダウンロード先URL", name: "保存ディレクトリ名"}
