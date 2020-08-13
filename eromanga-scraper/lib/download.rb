@@ -97,7 +97,7 @@ module Hentai
         text = line.attribute('data-src').value
         list = text.split('/')
         if /(\d+)t\.(.+)/ =~ list[5]
-          url_list << `https://i.nhentai.net/galleries/%s/%s.%s` % [list[4], $LAST_MATCH_INFO[1], $LAST_MATCH_INFO[2]]
+          url_list << "https://i.nhentai.net/galleries/#{list[4]}/#{Regexp.last_match[1]}.#{Regexp.last_match[2]}"
         end
       end
 
